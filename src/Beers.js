@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
+import Beer from "./Beer";
 
 const TOTAL_PAGES = 3;
 const BEERS_PER_PAGE = 25;
 
-const App = () => {
+const Beers = () => {
 	const [beers, setBeers] = useState([]);
 	const [page, setPage] = useState(1);
 	const [loading, setLoading] = useState(true);
@@ -20,20 +21,18 @@ const App = () => {
 			}
 		})
 	);
-
+	const fetchData = async () => {
+		try {
+			setLoading(true);
+			let response = await axios.get(API_URL);
+			let allBeers = [...beers, ...response.data];
+			setBeers([...allBeers]);
+			setLoading(false);
+		} catch (err) {
+			// @todo: handle error
+		}
+	};
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				setLoading(true);
-				let response = await axios.get(API_URL);
-				let allBeers = [...beers, ...response.data];
-				setBeers([...allBeers]);
-				setLoading(false);
-			} catch (err) {
-				// @todo: handle error
-			}
-		};
-
 		if (TOTAL_PAGES >= page) {
 			fetchData();
 		}
@@ -61,24 +60,10 @@ const App = () => {
 				beers.map((beer, index) => {
 					return !loading && index === beers.length - 1 && TOTAL_PAGES >= page ? (
 						<div key={beer.id} id={beer.id} ref={setLast}>
-							<li key={beer.id}>
-								<img src={beer.image_url} alt={beer.name} />
-								<p>
-									{beer.name} - {beer.tagline}
-								</p>
-								<p>{beer.description}</p>
-								<p>{beer.food_pairing}</p>
-							</li>
+							<Beer beer={beer} />
 						</div>
 					) : (
-						<li key={beer.id}>
-							<img src={beer.image_url} alt={beer.name} />
-							<p>
-								{beer.name} - {beer.tagline}
-							</p>
-							<p>{beer.description}</p>
-							<p>{beer.food_pairing}</p>
-						</li>
+						<Beer beer={beer} key={beer.id} id={beer.id} />
 					);
 				})}
 			{TOTAL_PAGES === page - 1 && <p>No more results to fetch</p>}
@@ -86,4 +71,4 @@ const App = () => {
 	);
 };
 
-export default App;
+export default Beers;
