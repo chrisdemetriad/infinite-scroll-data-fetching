@@ -10,8 +10,10 @@ const Beers = () => {
 	const [page, setPage] = useState(1);
 	const [loading, setLoading] = useState(true);
 	const [last, setLast] = useState(null);
+	const [abv, setAbv] = useState(3);
 
-	const API_URL = `https://api.punkapi.com/v2/beers?page=${page}&per_page=${BEERS_PER_PAGE}`;
+	const params = `page=${page}&per_page=${BEERS_PER_PAGE}&abv_gt=${abv}`;
+	const API_URL = `https://api.punkapi.com/v2/beers?${params}`;
 
 	const observer = useRef(
 		new IntersectionObserver((beers) => {
@@ -23,6 +25,7 @@ const Beers = () => {
 	);
 	const fetchData = async () => {
 		try {
+			setBeers([]);
 			setLoading(true);
 			let response = await axios.get(API_URL);
 			let allBeers = [...beers, ...response.data];
@@ -36,7 +39,7 @@ const Beers = () => {
 		if (TOTAL_PAGES >= page) {
 			fetchData();
 		}
-	}, [page]);
+	}, [page, abv]);
 
 	useEffect(() => {
 		const current = last;
@@ -55,6 +58,16 @@ const Beers = () => {
 
 	return (
 		<>
+			<input
+				type="range"
+				min="1"
+				max="8"
+				value={abv}
+				onChange={({ target: { value: number } }) => {
+					setAbv(number);
+				}}
+			/>
+			<div className="buble">{abv}</div>
 			{loading && <p>Loading</p>}
 			{beers.length > 0 &&
 				beers.map((beer, index) => {
@@ -63,7 +76,7 @@ const Beers = () => {
 							<Beer beer={beer} />
 						</div>
 					) : (
-						<Beer beer={beer} key={beer.id} id={beer.id} />
+						<Beer beer={beer} key={Math.round(Math.random() * 200000)} />
 					);
 				})}
 			{TOTAL_PAGES === page - 1 && <p>No more results to fetch</p>}

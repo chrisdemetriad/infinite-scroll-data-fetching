@@ -1,13 +1,13 @@
 const Beer = ({ beer }) => {
 	return (
-		<li key={beer.id}>
-			<img src={beer.image_url} alt={beer.name} />
+		<div key={beer.id} id={`id${beer.id}`}>
+			<img src={beer.image_url} alt={beer.name} width="120" />
 			<p>
-				{beer.name} - {beer.tagline}
+				{beer.abv} - {beer.name} - {beer.tagline}
 			</p>
 			<p>{beer.description}</p>
 			<p>{beer.food_pairing}</p>
-		</li>
+		</div>
 	);
 };
 
